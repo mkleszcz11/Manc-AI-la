@@ -5,6 +5,7 @@
 from Game import Game
 import copy
 import random
+from MonteCarlo import MonteCarlo
 
 
 class Agent:
@@ -114,7 +115,11 @@ class Agent:
             return [best_move, minEval]
 
     def monte_carlo(self, game: Game):
-        pass
+        """
+        Implemetation of Monte Carlo Tree Search, moved to the separate class for the code clarity.
+        """
+        monte_carlo = MonteCarlo(game, self.player_number)
+        return monte_carlo.get_best_move(game)
 
     def random_move(self, game: Game):
         """
