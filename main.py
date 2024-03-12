@@ -12,6 +12,7 @@ https://github.com/simonmoesorensen/KalahaAI/tree/master
 
 """
 
+
 # Function not changed from original
 def print_game(game):
     state = game.get_state()
@@ -25,13 +26,17 @@ def print_game(game):
 
     player2_fields_display = player2_fields[::-1]  # Reverse for display
 
-    print("Slots:   | ", end=""); print(*slots, sep=" | ", end=""); print(" |")
+    print("Slots:   | ", end="")
+    print(*slots, sep=" | ", end="")
+    print(" |")
     print("=======================================")
     print("Player 2 | ", end="")
-    print(*player2_fields_display, sep=" | ", end=""); print(" | Score: {0}".format(player2_score))
+    print(*player2_fields_display, sep=" | ", end="")
+    print(" | Score: {0}".format(player2_score))
     print("---------------------------------------")
     print("Player 1 | ", end="")
-    print(*player1_fields, sep=" | ", end=""); print(" | Score: {0}".format(player1_score))
+    print(*player1_fields, sep=" | ", end="")
+    print(" | Score: {0}".format(player1_score))
     print("=======================================")
 
 
@@ -55,8 +60,9 @@ if __name__ == "__main__":
     print("Very hard (and very slow): 3")
     rec_limit = 2 + check_input("Choose difficulty level: ") * 2
 
-    ai_agent = Agent(algorithm = "minimax",
-                     tree_depth = rec_limit)
+    ai_agent_player_1 = Agent(algorithm="minimax", tree_depth=2, player_number=0)  # Optional - AI as human (player 1)
+    ai_agent_player_2 = Agent(algorithm="minimax", tree_depth=6)  # AI for player 2
+    # ai_agent_player_2 = Agent(algorithm="alphabeta", tree_depth=6, player_number=0)  # Optional - AI as human (player 2)
 
     # Run game
     game = Game()
@@ -72,12 +78,14 @@ if __name__ == "__main__":
 
         slot = None
         if player_turn == 0:
-            # Player
-            slot = check_input("Choose which slot to pick up (index at 0): ")
+            # Player 1 - human or AI
+            # slot = check_input("Choose which slot to pick up (index at 0): ")
+            slot = ai_agent_player_1.get_best_move(game)
+            # print(f"AGENT moved stones from slot slot")
         else:
-            # AI - This was written by us.
+            # Player 2 - always AI
             print("AI computing best move:", end="")
-            slot = ai_agent.get_best_move(game)
+            slot = ai_agent_player_2.get_best_move(game)
             print(f"AI moved stones from {5 - slot} slot")
 
         game_seq.append((player_turn, slot))
@@ -90,6 +98,8 @@ if __name__ == "__main__":
             should_end = True
             print_game(game)
 
-    print("Game over, winner is Player {0}".format(winner))
+    print("Game over, winner is Player {0}".format(winner + 1))
     print("Game sequence:", game_seq)
+    print(f"Player 1 (AI) examined {ai_agent_player_1.number_of_investigated_states} states")
+    print(f"Player 2 (AI) examined {ai_agent_player_2.number_of_investigated_states} states")
     input("Press Enter to end...")

@@ -6,13 +6,10 @@
 
 import copy
 
+
 class Game:
     def __init__(self):
-        self.state = {"p0_fields": [4] * 6,
-                      "p1_fields": [4] * 6,
-                      "p0_score": 0,
-                      "p1_score": 0,
-                      "player_turn": 0}
+        self.state = {"p0_fields": [4] * 6, "p1_fields": [4] * 6, "p0_score": 0, "p1_score": 0, "player_turn": 0}
 
     def get_state(self):
         return copy.deepcopy(self.state)
@@ -21,11 +18,11 @@ class Game:
         return self.state["player_turn"]
 
     def take_slot(self, pocket):
-        '''
+        """
         Function to take a slot from the game board
         It updates the game state based on the move
         If move is not valid, it returns False
-        '''
+        """
         if pocket > 5 or pocket < 0:
             print("Invalid pocket")
             return False
@@ -39,15 +36,19 @@ class Game:
 
         pocket_pieces = self.state[f"{player}_fields"][pocket]
         self.state[f"{player}_fields"][pocket] = 0
-        
+
         current_pocket = pocket
         player_changed = False
 
         while pocket_pieces > 0:
             current_pocket += 1
             if current_pocket == 6:  # When reaching the player's score slot
-                if player == "p0" and self.state["player_turn"] == 0 or\
-                   player == "p1" and self.state["player_turn"] == 1:
+                if (
+                    player == "p0"
+                    and self.state["player_turn"] == 0
+                    or player == "p1"
+                    and self.state["player_turn"] == 1
+                ):
                     self.state[f"{player}_score"] += 1
                     pocket_pieces -= 1
                     if pocket_pieces == 0:  # End in own store
@@ -61,15 +62,17 @@ class Game:
             pocket_pieces -= 1
 
         # Check if last piece ends in own empty pocket - possible capture
-        if self.state[f"{player}_fields"][current_pocket] == 1 \
-           and not player_changed \
-           and self.state[f"{opponent}_fields"][5 - current_pocket] > 0:  
+        if (
+            self.state[f"{player}_fields"][current_pocket] == 1
+            and not player_changed
+            and self.state[f"{opponent}_fields"][5 - current_pocket] > 0
+        ):
             self.capture(current_pocket, player, opponent)
 
         # Switch player turn if last piece did not end in own store
         if current_pocket != 0:
             self.state["player_turn"] = 1 - self.state["player_turn"]
-        
+
         return True
 
     def capture(self, pocket, player, opponent):
