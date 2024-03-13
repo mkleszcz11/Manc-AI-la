@@ -8,3 +8,7 @@ class MonteCarlo:
 
     def get_best_move(self, game: Game) -> int:
         pass
+
+    def tree_search_MC(self):
+        a = 2
+        return a
