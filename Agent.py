@@ -4,12 +4,13 @@
 
 from Game import Game
 import copy
+import math
 import random
-from MonteCarlo import MonteCarlo
+from MonteCarlo import MCTSNode
 
 
 class Agent:
-    def __init__(self, algorithm, tree_depth, player_number=1):
+    def __init__(self, algorithm, tree_depth = 1, player_number=1):
         self.algorithm = algorithm
         self.tree_depth = tree_depth
         self.player_number = player_number  # AI agent by default is player 1, however we should be able to change this in order to test the AI agents against itself
@@ -37,7 +38,7 @@ class Agent:
         elif self.algorithm == "random":
             return self.random_move(game)
         elif self.algorithm == "montecarlo":
-            return self.monte_carlo(game)
+            return self.monte_carlo_tree_search(game)
         else:
             raise ValueError("Algorithm not supported")
 
@@ -114,13 +115,6 @@ class Agent:
                     break
             return [best_move, minEval]
 
-    def monte_carlo(self, game: Game):
-        """
-        Implemetation of Monte Carlo Tree Search, moved to the separate class for the code clarity.
-        """
-        monte_carlo = MonteCarlo(game, self.player_number)
-        return monte_carlo.get_best_move(game)
-
     def random_move(self, game: Game):
         """
         Function to return a random valid move.
@@ -176,3 +170,46 @@ class Agent:
                 self.number_of_investigated_states += 1
 
         return moves_dict
+    def monte_carlo_tree_search(self, game, num_simulations=5000):
+        # initial root
+        root = MCTSNode(game_state=copy.deepcopy(game), parent=None)
+
+        for _ in range(num_simulations):
+            node = root
+            simulation_game = copy.deepcopy(game)
+
+            # choose
+            while node.untried_moves == [] and node.children != []:
+                node = node.select_child()
+                simulation_game.take_slot(node.move)
+
+            # expand
+            if node.untried_moves != []:
+                move = random.choice(node.untried_moves)
+                simulation_game.take_slot(move)
+                node = node.add_child(move, simulation_game)
+                self.number_of_investigated_states += 1
+
+            # simulate
+          
+            while not simulation_game.is_terminal_state():
+                possible_moves = simulation_game.get_legal_moves()
+                move = random.choice(possible_moves)
+                simulation_game.take_slot(move)
+            
+            if simulation_game.is_terminal_state():
+                # evaluate result
+                if simulation_game.end_game() == self.player_number:
+                    result = 1  
+                else:
+                    result = 0  
+
+
+            # turn out
+            while node is not None:
+                node.update(result)
+                node = node.parent
+
+        
+        return max(root.children, key=lambda c: c.wins / c.visits).move
+

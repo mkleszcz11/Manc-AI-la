@@ -100,3 +100,11 @@ class Game:
         else:
             winner = -1  # Draw
         return winner
+    def get_legal_moves(self):
+        legal_moves = []
+        current_player_pits = self.state['p0_fields'] if self.state['player_turn'] == 0 else self.state['p1_fields']
+        for i, seeds in enumerate(current_player_pits):
+            if seeds > 0:  # A move is legal if the pit contains one or more seeds
+                legal_moves.append(i)
+        return legal_moves
+

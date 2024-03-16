@@ -1,6 +1,7 @@
 from Game import Game
 from Agent import Agent
 
+
 """
 This is the main script which runs the game with one player and one AI.
 
@@ -61,9 +62,9 @@ if __name__ == "__main__":
     rec_limit = 2 + check_input("Choose difficulty level: ") * 2
 
     ai_agent_player_1 = Agent(algorithm="minimax", tree_depth=2, player_number=0)  # Optional - AI as human (player 1)
-    ai_agent_player_2 = Agent(algorithm="minimax", tree_depth=6)  # AI for player 2
-    # ai_agent_player_2 = Agent(algorithm="alphabeta", tree_depth=6, player_number=0)  # Optional - AI as human (player 2)
-
+    # ai_agent_player_2 = Agent(algorithm="minimax", tree_depth=6)  # AI for player 2
+    # ai_agent_player_1 = Agent(algorithm="alphabeta", tree_depth=6, player_number=0)  # Optional - AI as human (player 2)
+    ai_agent_player_2 = Agent(algorithm="montecarlo",  player_number=1)
     # Run game
     game = Game()
     should_end = game.is_terminal_state()
